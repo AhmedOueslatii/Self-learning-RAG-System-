@@ -74,6 +74,54 @@ Local development against real Cloudflare resources:
 npx wrangler dev --remote
 ```
 
+## Environments
+
+Two environments share the same code but use isolated resources, so staging
+ingestion never pollutes the production knowledge base.
+
+| Environment | Worker | D1 | Vectorize |
+| --- | --- | --- | --- |
+| production | `rag-reflection-system` | `rag-db` | `rag-index` |
+| staging | `rag-reflection-system-staging` | `rag-db-staging` | `rag-index-staging` |
+
+```bash
+pnpm run deploy            # production
+pnpm run deploy:staging    # staging
+
+pnpm run dev               # local, production resources
+pnpm run dev:staging       # local, staging resources
+```
+
+Test risky changes against staging first:
+
+```bash
+pnpm run deploy:staging
+curl -X POST https://rag-reflection-system-staging.<subdomain>.workers.dev/ingest \
+  -H "Content-Type: application/json" -d '{"content": "..."}'
+```
+
+## Contributing
+
+`main` is always deployable. Work happens on short-lived branches that merge
+back through a pull request — there is no long-lived `dev` branch.
+
+```bash
+git switch -c feat/my-change
+# ...edit, then:
+pnpm run typecheck && pnpm run test:run
+git commit -am "Describe the change"
+git push -u origin feat/my-change
+```
+
+Open a pull request from the link git prints. CI runs typecheck and tests on
+every PR. When `main` moves ahead while you work, rebase rather than merge:
+
+```bash
+git fetch origin
+git rebase origin/main
+git push --force-with-lease
+```
+
 ## Deviations from the tutorial
 
 Four issues surfaced while building this, each failing silently or with a misleading error:
