@@ -4,9 +4,15 @@
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
+		"deploy:staging": "wrangler deploy --env staging",
 		"dev": "wrangler dev",
+		"dev:staging": "wrangler dev --env staging",
 		"start": "wrangler dev",
 		"test": "vitest",
+		"test:run": "vitest run",
+		"typecheck": "tsc --noEmit",
+		"migrate": "wrangler d1 migrations apply rag-db --remote",
+		"migrate:staging": "wrangler d1 migrations apply rag-db-staging --remote",
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {

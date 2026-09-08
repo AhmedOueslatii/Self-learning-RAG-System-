@@ -28,6 +28,36 @@
 	],
 	"ai": {
 		"binding": "AI"
+	},
+	/**
+	 * Staging environment: same code, isolated resources.
+	 * Deploy with `pnpm run deploy:staging`.
+	 */
+	"env": {
+		"staging": {
+			"observability": {
+				"enabled": true
+			},
+			"upload_source_maps": true,
+			"vectorize": [
+				{
+					"binding": "VECTORIZE",
+					"index_name": "rag-index-staging",
+					"remote": true
+				}
+			],
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "rag-db-staging",
+					"database_id": "e4556b35-f050-4c2f-8f4b-03fa14d9e01e",
+					"remote": true
+				}
+			],
+			"ai": {
+				"binding": "AI"
+			}
+		}
 	}
 	/**
 	 * Smart Placement
