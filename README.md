@@ -100,6 +100,45 @@ curl -X POST https://rag-reflection-system-staging.<subdomain>.workers.dev/inges
   -H "Content-Type: application/json" -d '{"content": "..."}'
 ```
 
+## CI/CD
+
+Two workflows in `.github/workflows/`:
+
+**`ci.yml`** — runs on every pull request to `main`. Typechecks, then runs the
+test suite. Tests reach real Workers AI, so they are skipped when
+`CLOUDFLARE_API_TOKEN` is not configured rather than failing.
+
+**`deploy.yml`** — runs on merge to `main`:
+
+```
+merge to main
+   ↓
+deploy to staging      (automatic: migrations, then deploy)
+   ↓
+   ⏸  waits for approval in the Actions tab
+   ↓
+deploy to production   (migrations, then deploy)
+```
+
+Production is gated by required reviewers on the `production` GitHub
+Environment, so a merge never reaches real users unattended. `workflow_dispatch`
+allows deploying without a merge.
+
+D1 migrations run via `wrangler d1 migrations apply`, which tracks applied
+migrations in the `d1_migrations` table and only runs new ones.
+
+### Required setup
+
+Add under **Settings → Secrets and variables → Actions**:
+
+| Secret | Where to get it |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → *Edit Cloudflare Workers* template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Account ID |
+
+Then under **Settings → Environments**, create `staging` and `production`, and
+add yourself as a required reviewer on `production` to enable the approval gate.
+
 ## Contributing
 
 `main` is always deployable. Work happens on short-lived branches that merge
