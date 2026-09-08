@@ -70,11 +70,13 @@ export default {
 			});
 
 			// Reflections and summaries outrank raw chunks on conceptual queries.
+			// rawScore and boost are kept so clients can show why a result ranked.
 			const boosted = (results.matches ?? [])
 				.map((m) => {
 					const docType = m.metadata?.doc_type as string | undefined;
 					const boost = docType === 'reflection' || docType === 'summary' ? Number(m.metadata?.reflection_score ?? 1.5) : 1;
-					return { ...m, score: (m.score ?? 0) * boost };
+					const rawScore = m.score ?? 0;
+					return { ...m, rawScore, boost, score: rawScore * boost };
 				})
 				.sort((a, b) => b.score - a.score);
 
@@ -96,7 +98,11 @@ export default {
 				sources: boosted.map((m) => ({
 					id: m.id,
 					score: m.score,
+					rawScore: m.rawScore,
+					boost: m.boost,
 					doc_type: m.metadata?.doc_type ?? 'raw',
+					content: (m.metadata?.content as string) ?? '',
+					source: (m.metadata?.source as string) ?? '',
 				})),
 			});
 		}
@@ -127,6 +133,16 @@ export default {
 				'SELECT id, doc_type, reflection_score, date_created, substr(content, 1, 200) AS preview FROM documents ORDER BY date_created DESC LIMIT 50'
 			).all();
 			return Response.json({ documents: rows.results });
+		}
+
+		if (url.pathname === '/health') {
+			return Response.json({ status: 'ok' });
+		}
+
+		// Anything else is a static asset (the web UI). Falls back to a plain
+		// response when no assets binding is configured.
+		if (env.ASSETS) {
+			return env.ASSETS.fetch(request);
 		}
 
 		return new Response('RAG system running', { status: 200 });

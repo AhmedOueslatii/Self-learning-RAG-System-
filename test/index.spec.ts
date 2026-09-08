@@ -7,21 +7,21 @@ import worker from "../src/index";
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
 describe("RAG worker routing", () => {
-	it("responds on the root route (unit style)", async () => {
-		const request = new IncomingRequest("http://example.com");
+	it("reports health (unit style)", async () => {
+		const request = new IncomingRequest("http://example.com/health");
 		// Create an empty context to pass to `worker.fetch()`.
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(request, env, ctx);
 		// Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
 		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(200);
-		expect(await response.text()).toMatchInlineSnapshot(`"RAG system running"`);
+		expect(await response.json()).toEqual({ status: "ok" });
 	});
 
-	it("responds on the root route (integration style)", async () => {
-		const response = await SELF.fetch("https://example.com");
+	it("reports health (integration style)", async () => {
+		const response = await SELF.fetch("https://example.com/health");
 		expect(response.status).toBe(200);
-		expect(await response.text()).toMatchInlineSnapshot(`"RAG system running"`);
+		expect(await response.json()).toEqual({ status: "ok" });
 	});
 
 	it("rejects /ingest without content", async () => {
