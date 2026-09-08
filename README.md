@@ -25,6 +25,23 @@ Built following [this freeCodeCamp tutorial](https://www.freecodecamp.org/news/h
 
 Specific factual queries still return raw chunks; broad conceptual queries surface reflections and summaries.
 
+## Web UI
+
+The Worker serves a single-page interface from `public/` via Workers Static
+Assets — no separate deploy, no build step. Open the Worker's root URL, or run
+`pnpm run dev` and visit `http://localhost:8787`.
+
+Three tabs:
+
+- **Search** — ask a question and see the answer plus every retrieved source,
+  colour-coded by type. Boosted results show their arithmetic (`0.583 × 1.8 =
+  1.049`), which makes the ranking mechanic visible: a summary can outrank a raw
+  chunk that scored higher on raw similarity.
+- **Add knowledge** — ingest a document, optionally running reflection
+  immediately rather than in the background.
+- **Knowledge base** — counts by type, every stored document with its boost, and
+  a button to force consolidation.
+
 ## Endpoints
 
 | Method | Path | Description |
@@ -34,6 +51,8 @@ Specific factual queries still return raw chunks; broad conceptual queries surfa
 | `POST` | `/reflect` | Run reflection synchronously for one document (`{id}`) |
 | `POST` | `/consolidate` | Force consolidation of pending reflections |
 | `GET` | `/documents` | List stored documents with type and score |
+| `GET` | `/health` | Liveness check |
+| `GET` | `/*` | Static assets (the web UI) |
 
 ## Setup
 

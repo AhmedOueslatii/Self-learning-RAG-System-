@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Self-Learning RAG</title>
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧠</text></svg>" />
+		<link rel="stylesheet" href="/style.css" />
+	</head>
+	<body>
+		<header class="masthead">
+			<h1>Self-Learning RAG</h1>
+			<p class="tagline">
+				A knowledge base that writes its own notes. Every document you add is synthesised against what the system already knows, and
+				those syntheses become searchable — ranked <em>above</em> raw text.
+			</p>
+		</header>
+
+		<nav class="tabs" role="tablist">
+			<button class="tab is-active" role="tab" data-panel="search">Search</button>
+			<button class="tab" role="tab" data-panel="ingest">Add knowledge</button>
+			<button class="tab" role="tab" data-panel="browse">Knowledge base</button>
+		</nav>
+
+		<main>
+			<!-- SEARCH -->
+			<section id="panel-search" class="panel is-active">
+				<form id="search-form" class="composer">
+					<label class="sr-only" for="query">Question</label>
+					<input id="query" name="query" type="text" autocomplete="off" placeholder="Ask a question…" required />
+					<button type="submit" class="primary">Search</button>
+				</form>
+
+				<p class="hint">
+					Try a specific question and a broad one. Specific questions surface raw documents; conceptual questions surface the
+					system's own reflections.
+				</p>
+
+				<div class="examples" id="examples"></div>
+
+				<div id="search-status" class="status" hidden></div>
+
+				<article id="answer-card" class="answer" hidden>
+					<h2>Answer</h2>
+					<p id="answer-text"></p>
+				</article>
+
+				<section id="sources" hidden>
+					<h2>
+						Retrieved sources
+						<span class="subtle">ranked after reflection boost</span>
+					</h2>
+					<ol id="source-list" class="sources"></ol>
+				</section>
+			</section>
+
+			<!-- INGEST -->
+			<section id="panel-ingest" class="panel">
+				<form id="ingest-form" class="stack">
+					<label for="content">Document</label>
+					<textarea id="content" name="content" rows="7" placeholder="Paste a paragraph of knowledge…" required></textarea>
+
+					<div class="row">
+						<div class="field">
+							<label for="doc-id">ID <span class="subtle">optional</span></label>
+							<input id="doc-id" name="id" type="text" autocomplete="off" placeholder="auto-generated" />
+						</div>
+						<div class="field">
+							<label for="source">Source <span class="subtle">optional</span></label>
+							<input id="source" name="source" type="text" autocomplete="off" placeholder="e.g. cf-docs" />
+						</div>
+					</div>
+
+					<div class="actions">
+						<button type="submit" class="primary">Ingest</button>
+						<label class="checkbox">
+							<input type="checkbox" id="run-reflection" checked />
+							Run reflection immediately
+						</label>
+					</div>
+				</form>
+
+				<p class="hint">
+					Reflection compares the new document against related ones and writes a three-sentence synthesis. It needs at least one
+					related document scoring above 0.65 similarity, so the second document you add is the first that can produce one.
+				</p>
+
+				<div id="ingest-status" class="status" hidden></div>
+			</section>
+
+			<!-- BROWSE -->
+			<section id="panel-browse" class="panel">
+				<div class="composer">
+					<button id="refresh" type="button" class="primary">Refresh</button>
+					<button id="consolidate" type="button" class="ghost">Force consolidation</button>
+				</div>
+
+				<p class="hint">
+					Consolidation compresses several reflections into a higher-level summary. It runs automatically every three reflections.
+				</p>
+
+				<div id="counts" class="counts" hidden></div>
+				<div id="browse-status" class="status" hidden></div>
+				<ul id="doc-list" class="docs"></ul>
+			</section>
+		</main>
+
+		<footer>
+			<span>Cloudflare Workers · Vectorize · D1 · Workers AI</span>
+		</footer>
+
+		<script src="/app.js"></script>
+	</body>
+</html>

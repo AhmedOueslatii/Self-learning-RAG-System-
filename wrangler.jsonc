@@ -29,6 +29,10 @@
 	"ai": {
 		"binding": "AI"
 	},
+	"assets": {
+		"directory": "./public/",
+		"binding": "ASSETS"
+	},
 	/**
 	 * Staging environment: same code, isolated resources.
 	 * Deploy with `pnpm run deploy:staging`.
@@ -56,6 +60,10 @@
 			],
 			"ai": {
 				"binding": "AI"
+			},
+			"assets": {
+				"directory": "./public/",
+				"binding": "ASSETS"
 			}
 		}
 	}
